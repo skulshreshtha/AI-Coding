@@ -1,4 +1,30 @@
-notebooks
-.vscode
-.conda
+# Python virtual environments
 .venv
+env/
+.conda
+
+# Python bytecode cache
+*/__pycache__/
+*.pyc
+*.pyo
+
+# IDE and editor-specific cache
+.vscode/
+.idea/
+.sublime-project
+.sublime-workspace
+*.iml
+
+# Build tool cache
+target/
+build/
+cmake-build*/
+
+# Pytest cache
+.pytest_cache
+
+# Poetry lock file
+poetry.lock
+
+# Test Notebooks
+notebooks

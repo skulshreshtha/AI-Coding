@@ -4,3 +4,4 @@ Inspired by [Vinija Jain's AI Coding repo](https://github.com/vinija/AI-Coding)
 
 The current list includes:
 - [Gradient Descent](src/gradient_descent.py)
+- [Feature Scaling](src/feature_scaler.py)

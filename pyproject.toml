@@ -12,6 +12,7 @@ numpy = "^1.26.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
+pytest-mock = "^3.14.0"
 
 [build-system]
 requires = ["poetry-core"]

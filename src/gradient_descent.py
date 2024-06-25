@@ -20,6 +20,8 @@ import argparse
 import sys
 import numpy as np
 
+from .utils.sigmoid import sigmoid
+
 def batch_simple_linear(x, y, max_iterations=1000, learning_rate=0.001, stopping_threshold=1e-6):
     """
     Performs batch gradient descent using a simple linear regression model, where
@@ -116,6 +118,55 @@ def batch_multi_linear(x, y, max_iterations=1000, learning_rate=0.001, stopping_
     print(f"Ran {i+1} iterations")
     return w, b
 
+def batch_multi_logistic(x, y, max_iterations=1000, learning_rate=0.001, stopping_threshold=1e-6):
+    """
+    Performs batch gradient descent using a multiple logistic regression model, where
+    y = sigmoid(WX + b), where W is a vector of shape (D,1) and X is an array of shape (m, D)
+    and we use log loss or cross entropy as the cost function
+    J = -1/m * (y*log(y_pred) + (1-y)log(1-y_pred))
+    The function returns the weight vector and bias for the fitted multi-dimensional plane that minimizes loss
+
+    Args:
+    x: Multi-dimensional array of predictor variable values with each row representing one training sample.
+    y: Vector of target variable values.
+    max_iterations: Maximum number of iterations.
+    stopping_threshold: Threshold to consider the change in W and b as insignificant between subsequent iterations.
+
+    Returns:
+    W: Vector of parameter weights
+    b: Bias term
+    """
+    # Initialize w and b
+    w, b = np.zeros((x.shape[1],1)), 0 # we should have as many weights as features
+    print(f"Started with w = {w} and b = {b}")
+
+    # Number of training samples
+    m = len(x)
+
+    for i in range(max_iterations):
+        # Predict y using current values of w and b
+        # Use dot product as both w and x are arrays
+        y_pred = sigmoid(x @ w + b) # Note the order as x is shape (m, D) and w is shape (D, 1)
+        # Now shape of y_pred is (m,1)
+
+        # Compute cost as mean squared error between predicted and actual y-values.
+        cost = np.mean((-y*np.log(y_pred) -(1-y)*(1-np.log(y_pred))))
+
+        # Compute gradients
+        dw = (2/m) * (x.T @ (y_pred - y)) # Use dot product to make dw of shape (D, 1)
+        db = 2 * np.mean((y_pred - y))
+
+        # Update params
+        w -= learning_rate * dw # This automatically updates all weights in the vector
+        b -= learning_rate * db
+
+        # Check if the updates are insignificant
+        if max(max(abs(learning_rate * dw)), abs(learning_rate * db)) < stopping_threshold:
+            break
+    
+    print(f"Ran {i+1} iterations")
+    return w, b
+
 if __name__ == "__main__":
         parser = argparse.ArgumentParser()
         parser.add_argument('--variant', type=str, default='batch_simple_linear',
@@ -124,6 +175,7 @@ if __name__ == "__main__":
                              Variant of gradient descent to use: 
                              batch_simple_linear = Batch mode, single variable, linear regression
                              batch_multi_linear = Batch mode, multiple input variables, linear regression
+                             batch_multi_logistic = Batch mode, multiple input variables, logistic regression
                              """)
         parser.add_argument('--learning_rate', type=float, default=0.001,
                             help=
@@ -162,6 +214,18 @@ if __name__ == "__main__":
             b_true = 0.05
             y = x @ w_true + b_true # Using dot product
             w, b = batch_multi_linear(x, y, learning_rate=args.learning_rate, max_iterations=args.max_iterations, stopping_threshold=args.stopping_threshold)
+            print(f"Weights of the fitted plane = {w}, Actual Weights = {w_true}")
+            print(f"Bias term = {b}, Actual Bias = {b_true}")
+        elif args.variant == 'batch_multi_logistic':
+            x = np.array([[4, 4],
+                  [8, 8],
+                  [12, 12],
+                  [16, 16]])
+            w_true = np.array([[0.50],
+                            [0.50]])
+            b_true = 0.05
+            y = sigmoid(x @ w_true + b_true) # Using dot product
+            w, b = batch_multi_logistic(x, y, learning_rate=args.learning_rate, max_iterations=args.max_iterations, stopping_threshold=args.stopping_threshold)
             print(f"Weights of the fitted plane = {w}, Actual Weights = {w_true}")
             print(f"Bias term = {b}, Actual Bias = {b_true}")
         else:

@@ -6,3 +6,4 @@ The current list includes:
 - [Gradient Descent](src/gradient_descent.py)
 - [Feature Scaling](src/feature_scaler.py)
 - [Linear Regression](src/linear_regression.py)
+- [Logistic Regression](src/logistic_regression.py)
